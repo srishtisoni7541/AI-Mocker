@@ -4,6 +4,7 @@ import { db } from "@/utils/db";
 import { MockInterview } from "@/utils/schema";
 import { eq } from "drizzle-orm";
 import { Lightbulb, WebcamIcon } from "lucide-react";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Webcam from "react-webcam";
 
@@ -79,8 +80,10 @@ const interview = ({ params }) => {
           )}
         </div>
       </div>
-   <div className="flex justify-end items-end">
-   <Button>Start Interview</Button>
+   <div className="flex justify-end items-end mt-4">
+  <Link href={'/dashboard/interview/'+params.interview+'/start'}>
+  <Button>Start Interview</Button>
+  </Link>
    </div>
     </div>
   );
