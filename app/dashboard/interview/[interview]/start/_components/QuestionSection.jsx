@@ -1,41 +1,18 @@
-// import React from "react";
 
-// const QuestionSection = ({ mockInterviewQuestions, activeQuestionIndex }) => {
-//   // Flatten if it's nested like [[...]]
-//   const questions = Array.isArray(mockInterviewQuestions?.[0])
-//     ? mockInterviewQuestions[0]
-//     : mockInterviewQuestions;
 
-//   return (
-//     <div className="p-5  mt-4 border rounded-lg">
-//       <div className=" p-2 grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-//         {questions &&
-//           questions.map((question, index) => (
-//             <div key={index} className="mb-4">
-//               <h2
-//                className={`font-bold text-lg p-2 rounded-full text-xs md:text-sm text-center cursor-pointer ${
-//                 activeQuestionIndex === index
-//                   ? "bg-black text-white"
-//                   : "bg-secondary"
-//               }`}
-//               >
-//                 Question $ {index + 1}:
-//               </h2>
-//               {/* <h2>{mockInterviewQuestions[activeQuestionIndex]?.question}</h2> */}
-//               <h2>{question.question}</h2>
-//             </div>
-//           ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default QuestionSection;
-
-import { Lightbulb } from "lucide-react";
+import { Lightbulb, Volume2 } from "lucide-react";
 import React from "react";
 
 const QuestionSection = ({ mockInterviewQuestions, activeQuestionIndex }) => {
+  const TextToSpeech=(text)=>{
+    if('speechSynthesis' in window){
+      const speech = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(speech)
+    } else{
+      alert('Sorry your Browser does not support text to speech!')
+    }
+
+  }
   // Flatten if it's nested like [[...]]
   const questions = Array.isArray(mockInterviewQuestions?.[0])
     ? mockInterviewQuestions[0]
@@ -59,6 +36,7 @@ const QuestionSection = ({ mockInterviewQuestions, activeQuestionIndex }) => {
               >
                 Question {index + 1}
               </h2>
+             
             </div>
           ))}
       </div>
@@ -72,6 +50,9 @@ const QuestionSection = ({ mockInterviewQuestions, activeQuestionIndex }) => {
           <p className="text-gray-700 mb-4 my-2 text-md md:text-lg">
             {activeQuestion.question}
           </p>
+          <h2>
+                <Volume2 className="cursor-pointer" onClick={()=>TextToSpeech(activeQuestion.question)}/>
+              </h2>
           {/* <h3 className="text-md font-semibold">Answer:</h3>
           <p className="text-gray-600">{activeQuestion.answer}</p> */}
         </div>

@@ -1,75 +1,72 @@
-// 'use client'
-// import { Button } from '@/components/ui/button'
-// import React from 'react'
-// import { useSpeechRecognition } from 'react-speech-recognition'
-// import Webcam from 'react-webcam'
-
-// const RecordAnswerSection = () => {
-//     const Dictaphone = () => {
-//         const {
-//           transcript,
-//           listening,
-//           resetTranscript,
-//           browserSupportsSpeechRecognition
-//         } = useSpeechRecognition()
-//     }
-    
-//   return (
-//    <div className='flex items-center justify-center flex-col'>
-//      <div className='flex items-center justify-center bg-black  rounded-lg p-4 mt-20 ml-5'>
-//       <Webcam/>
-//     </div>
-//     <Button variant="outline" className="mt-4 ml-4">Record Answer</Button>
-//     <div>
-//       <button onClick={startListening}>Start</button>
-//       <button onClick={SpeechRecognition.abortListening}>Abort</button>
-//       <button onClick={resetTranscript}>Reset</button>
-//       <p>{transcript}</p>
-//     </div>
-//    </div>
-//   )
-// }
-
-// export default RecordAnswerSection
-
 
 
 'use client'
 
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import React from 'react'
-import { useSpeechRecognition } from 'react-speech-recognition'
-import SpeechRecognition from 'react-speech-recognition'
 import Webcam from 'react-webcam'
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+import { Mic } from 'lucide-react'
 
 const RecordAnswerSection = () => {
   const {
     transcript,
     listening,
     resetTranscript,
-    browserSupportsSpeechRecognition
+    results,
+    browserSupportsSpeechRecognition,
   } = useSpeechRecognition()
 
+  const [isRecording, setIsRecording] = useState(false); // State to manage recording status
+
+  // console.log(transcript);
   if (!browserSupportsSpeechRecognition) {
     return <span>Your browser does not support speech recognition.</span>
   }
 
+  const handleStart = () => {
+    console.log('Start clicked')
+    SpeechRecognition.startListening({
+      continuous: true,
+      language: 'en-IN',
+    })
+    setIsRecording(true); // Set isRecording to true when recording starts
+  }
+
+  const handleStop = () => {
+    console.log('Stop clicked')
+    SpeechRecognition.stopListening()
+    setIsRecording(false); // Set isRecording to false when recording stops
+  }
+
   return (
-    <div className='flex items-center justify-center flex-col'>
-      <div className='flex items-center justify-center bg-black rounded-lg p-4 mt-20 ml-5'>
+    <div className="flex items-center justify-center flex-col">
+      <div className="flex items-center justify-center bg-black rounded-lg p-4 mt-20 ml-5">
         <Webcam />
       </div>
 
-      <Button variant="outline" className="mt-4 ml-4">Record Answer</Button>
+      <Button 
+        onClick={isRecording ? handleStop : handleStart} // Only one onClick handler
+        variant="outline" 
+        className="mt-4 ml-4"
+      >
+        {isRecording ? 
+          <h2>
+            <Mic /> Recording...
+          </h2> : 
+          "Record Answer"
+        }
+      </Button>
 
-      <div className='mt-4'>
-        <button onClick={SpeechRecognition.startListening}>Start</button>
-        <button onClick={SpeechRecognition.abortListening}>Abort</button>
-        <button onClick={resetTranscript}>Reset</button>
-        <p className='mt-2 text-center'>Transcript: {transcript}</p>
+      <div className="mt-4 flex flex-col gap-2 items-center">
+        <p className="mt-4 text-center w-[80%] font-medium">
+          <strong>Transcript:</strong> {transcript}
+        </p>
       </div>
     </div>
   )
 }
 
 export default RecordAnswerSection
+
+
