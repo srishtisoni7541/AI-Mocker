@@ -44,6 +44,7 @@ const AddNewInterview = () => {
         techStack: jobDescription,
         experience: jobExperience,
       });
+      console.log(res);
     
       const result= await db.insert(MockInterview).values({
         mockId:uuidv4(),

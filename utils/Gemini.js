@@ -59,9 +59,6 @@
 
 
 
-
-
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const ai = new GoogleGenerativeAI("AIzaSyCV-6cC8w9_uYcHj9Xb-LQJwjdnXx2trf0");
@@ -102,34 +99,23 @@ async function generateInterviewQuestions({ jobRole, experience, techStack }) {
   const response = await result.response;
   let text = await response.text();
 
-  console.log("Raw Response from Gemini:", text); // Check the exact response from Gemini
+  console.log("Raw Response from Gemini:", text);
 
-  // CLEANING Gemini response: Remove ```json|``` if present
   text = text.replace(/```json|```/g, '').trim();
 
-  // Now, parse the outer JSON
-  let parsedData;
   try {
-    parsedData = JSON.parse(text);
+    const parsedData = JSON.parse(text);
+
+    if (!Array.isArray(parsedData)) {
+      throw new Error("Gemini response is not an array");
+    }
+
+    // ✅ Return as single JSON string for DB or frontend
+    return JSON.stringify(parsedData);
   } catch (error) {
-    console.error("Failed to parse JSON from Gemini:", error);
+    console.error("Failed to parse Gemini response:", error);
     throw new Error("Invalid JSON response from Gemini");
   }
-
-  // Now, parsedData contains the keys that are stringified JSON objects
-  const questions = Object.values(parsedData).map((str) => {
-    try {
-      // Each item is a stringified JSON, so parse it
-      return JSON.parse(str);
-    } catch (err) {
-      console.error("Error parsing question JSON:", err);
-      return null; // Handle invalid entries
-    }
-  }).filter(item => item !== null); // Remove any invalid items
-
-  console.log("Parsed Questions:", questions);
-
-  return questions;
 }
 
 export default generateInterviewQuestions;
