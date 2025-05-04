@@ -9,6 +9,7 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 import { Mic } from 'lucide-react'
 
 const RecordAnswerSection = () => {
+  const [userAnswer,setUserAnswer]=useState("");
   const {
     transcript,
     listening,
@@ -16,6 +17,17 @@ const RecordAnswerSection = () => {
     results,
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition()
+  const saveUserAnswer=()=>{
+    if(isRecording){
+      handleStop();
+      if(userAnswer?.length<10){
+        return ;
+      }
+    }
+    else{
+      handleStart();
+    }
+  }
 
   const [isRecording, setIsRecording] = useState(false); // State to manage recording status
 
@@ -46,7 +58,7 @@ const RecordAnswerSection = () => {
       </div>
 
       <Button 
-        onClick={isRecording ? handleStop : handleStart} // Only one onClick handler
+        onClick={saveUserAnswer} // Only one onClick handler
         variant="outline" 
         className="mt-4 ml-4"
       >
