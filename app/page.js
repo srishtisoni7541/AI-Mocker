@@ -24,7 +24,7 @@ export default function Home() {
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button 
                   className="bg-purple-600 hover:bg-purple-700 py-6 px-8 text-lg"
-                  onClick={() => window.location.href = '/auth/sign-in'}>
+                  onClick={() => window.location.href = '/dashboard'}>
                   Get Started <ArrowRight className="ml-2" size={18} />
                 </Button>
                 <Button variant="outline" className="border-purple-300 text-purple-700 py-6 px-8 text-lg">
@@ -181,7 +181,7 @@ export default function Home() {
           <div className="mt-12 text-center">
             <Button 
               className="bg-purple-600 hover:bg-purple-700 py-6 px-8 text-lg"
-              onClick={() => window.location.href = '/auth/sign-in'}>
+              onClick={() => window.location.href = '/dashboard'}>
               Start Your First Interview <ArrowRight className="ml-2" size={18} />
             </Button>
           </div>
