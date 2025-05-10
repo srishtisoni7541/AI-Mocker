@@ -59,7 +59,12 @@ const StartInterview = ({ params }) => { // ✅ Capital S
         <QuestionSection mockInterviewQuestions={mockInterviewQuestions}
         activeQuestionIndex={activeQuestionIndex}
         />
-        <RecordAnswerSection/>
+        <RecordAnswerSection mockInterviewQuestions={mockInterviewQuestions}
+        activeQuestionIndex={activeQuestionIndex}
+      setActiveQuestionIndex={setActiveQuestionIndex}
+        interviewData={interviewData}/>
+
+
       </div>
     </div>
   );

@@ -1,84 +1,154 @@
+"use client";
 
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import Webcam from "react-webcam";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+import { Mic } from "lucide-react";
+import { toast } from "sonner";
+import generateFeedback from "@/utils/GenerateFeedback";
+import { db } from "@/utils/db";
+import { useUser } from "@clerk/nextjs";
+import moment from "moment";
+import { UserAnswer } from "@/utils/schema";
+import Link from "next/link";
 
-'use client'
+const RecordAnswerSection = ({
+  mockInterviewQuestions,
+  activeQuestionIndex,
+  interviewData,
+  setActiveQuestionIndex,
+}) => {
+  console.log(interviewData);
+  const { user } = useUser();
+  const [loading, setLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
-import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import Webcam from 'react-webcam'
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
-import { Mic } from 'lucide-react'
-
-const RecordAnswerSection = () => {
-  const [userAnswer,setUserAnswer]=useState("");
   const {
     transcript,
-    listening,
     resetTranscript,
-    results,
     browserSupportsSpeechRecognition,
-  } = useSpeechRecognition()
-  const saveUserAnswer=()=>{
-    if(isRecording){
-      handleStop();
-      if(userAnswer?.length<10){
-        return ;
-      }
-    }
-    else{
-      handleStart();
-    }
-  }
+  } = useSpeechRecognition();
 
-  const [isRecording, setIsRecording] = useState(false); // State to manage recording status
+  const questions = Array.isArray(mockInterviewQuestions?.[0])
+    ? mockInterviewQuestions[0]
+    : Array.isArray(mockInterviewQuestions)
+    ? mockInterviewQuestions
+    : [];
 
-  // console.log(transcript);
-  if (!browserSupportsSpeechRecognition) {
-    return <span>Your browser does not support speech recognition.</span>
-  }
+  const activeQuestion = questions[activeQuestionIndex];
 
   const handleStart = () => {
-    console.log('Start clicked')
     SpeechRecognition.startListening({
       continuous: true,
-      language: 'en-IN',
-    })
-    setIsRecording(true); // Set isRecording to true when recording starts
-  }
+      language: "en-IN",
+    });
+    setIsRecording(true);
+  };
 
   const handleStop = () => {
-    console.log('Stop clicked')
-    SpeechRecognition.stopListening()
-    setIsRecording(false); // Set isRecording to false when recording stops
+    SpeechRecognition.stopListening();
+    setIsRecording(false);
+  };
+
+  const saveUserAnswer = async () => {
+    if (isRecording) {
+      setLoading(true);
+      handleStop();
+
+      const finalTranscript = transcript.trim();
+
+      if (finalTranscript.length < 10) {
+        toast("Error while saving your answer, Please record again!");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const feedback = await generateFeedback({
+          question: activeQuestion?.question,
+          answer: finalTranscript,
+        });
+        console.log(feedback);
+        console.log("datta:",interviewData.mockId);
+
+        await db.insert(UserAnswer).values({
+          mockIdRef: interviewData?.mockId,
+          question: activeQuestion?.question,
+          correctAns: finalTranscript,
+          userAns: finalTranscript,
+          feedBack: feedback?.feedback,
+          rating: feedback?.rating,
+          userEmail: user?.primaryEmailAddress?.emailAddress,
+          createdAt: moment().format("DD-MM-YYYY"),
+        });
+
+        toast("User Answer Recorded Successfully!");
+        resetTranscript();
+      } catch (err) {
+        console.error("Error saving answer:", err);
+        toast("Failed to save answer");
+      }
+
+      setLoading(false);
+    } else {
+      resetTranscript();
+      handleStart();
+    }
+  };
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Your browser does not support speech recognition.</span>;
   }
 
   return (
     <div className="flex items-center justify-center flex-col">
-      <div className="flex items-center justify-center bg-black rounded-lg p-4 mt-20 ml-5">
-        <Webcam />
+      <div className="flex items-center justify-center bg-black rounded-lg p-4 mt-10 ml-5">
+        <Webcam mirrored={true} />
       </div>
 
-      <Button 
-        onClick={saveUserAnswer} // Only one onClick handler
-        variant="outline" 
+      <Button
+        disabled={loading}
+        onClick={saveUserAnswer}
+        variant="outline"
         className="mt-4 ml-4"
       >
-        {isRecording ? 
-          <h2>
-            <Mic /> Recording...
-          </h2> : 
+        {isRecording ? (
+          <span className="flex items-center gap-2">
+            <Mic size={18} /> Recording...
+          </span>
+        ) : (
           "Record Answer"
-        }
+        )}
       </Button>
 
-      <div className="mt-4 flex flex-col gap-2 items-center">
-        <p className="mt-4 text-center w-[80%] font-medium">
-          <strong>Transcript:</strong> {transcript}
-        </p>
+      <div className="flex items-center justify-end gap-5 mt-4">
+        {activeQuestionIndex > 0 && (
+          <Button
+            className="py-2 px-6"
+            onClick={() => setActiveQuestionIndex(activeQuestionIndex - 1)}
+          >
+            Prev
+          </Button>
+        )}
+        {activeQuestionIndex < questions.length - 1 && (
+          <Button
+            className="py-2 px-6"
+            onClick={() => setActiveQuestionIndex(activeQuestionIndex + 1)}
+          >
+            Next
+          </Button>
+        )}
+        {activeQuestionIndex === questions.length - 1 && (
+         <Link href={`/dashboard/interview/${interviewData?.mockId}/feedback`}>
+          <Button className="py-2 px-6">End Interview</Button>
+         </Link>
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RecordAnswerSection
-
-
+export default RecordAnswerSection;

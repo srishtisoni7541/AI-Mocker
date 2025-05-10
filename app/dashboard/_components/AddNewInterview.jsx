@@ -59,7 +59,7 @@ const AddNewInterview = () => {
         setOpenDialog(false);
         router.push(`/dashboard/interview/${result[0]?.mockId}`);
       }
-      console.log(result);
+      // console.log(result);
     } catch (error) {
       console.error("Error generating interview questions:", error);
       alert("Failed to generate interview questions.");
