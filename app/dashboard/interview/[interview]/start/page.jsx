@@ -63,16 +63,26 @@ const StartInterview = ({ params }) => {
     }
   };
 
-  // ✅ Tab switch / minimize detection
+  // ✅ Improved tab switch / minimize detection
   useEffect(() => {
+    let blurTimeout;
+
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        handleAutoSubmit();
+      if (document.visibilityState === 'hidden') {
+        // delay to avoid false triggers from permission prompts
+        blurTimeout = setTimeout(() => {
+          handleAutoSubmit();
+        }, 1000);
       }
     };
 
     const handleWindowBlur = () => {
-      handleAutoSubmit();
+      // also use delay here to filter out permission prompt blur
+      blurTimeout = setTimeout(() => {
+        if (document.visibilityState === 'hidden') {
+          handleAutoSubmit();
+        }
+      }, 1000);
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -81,6 +91,7 @@ const StartInterview = ({ params }) => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleWindowBlur);
+      clearTimeout(blurTimeout);
     };
   }, []);
 
@@ -108,5 +119,3 @@ const StartInterview = ({ params }) => {
 };
 
 export default StartInterview;
-
-
