@@ -16,3 +16,7 @@ const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
 
 // Set up the drizzle ORM client with your schema
 export const db = drizzle({ client: sql, schema });
+
+
+
+

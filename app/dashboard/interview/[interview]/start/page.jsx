@@ -71,3 +71,7 @@ const StartInterview = ({ params }) => { // ✅ Capital S
 };
 
 export default StartInterview; // ✅ Correct
+
+
+
+
