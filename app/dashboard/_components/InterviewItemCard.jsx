@@ -5,20 +5,26 @@ import { useRouter } from "next/navigation";
 const InterviewItemCard = ({ interview }) => {
   let questions = [];
   const router = useRouter();
-  const onStart=()=>{
+  const onStart = () => {
     router.push(`/dashboard/interview/${interview.mockId}`);
-
-  }
-  const onFeedback=()=>{
-    router.push(`/dashboard/interview/${interview?.mockId}/feedback`)
-  }
+  };
+  const onFeedback = () => {
+    router.push(`/dashboard/interview/${interview?.mockId}/feedback`);
+  };
 
   try {
+    let questions = [];
+
     if (typeof interview.jsonMockRes === "string") {
-      questions = JSON.parse(interview.jsonMockRes || "[]");
+      let cleaned = interview.jsonMockRes
+        .replace(/\\"/g, '"') // Unescape quotes
+        .replace(/}{/g, "},{"); // Add commas between objects
+
+      questions = JSON.parse(`[${cleaned}]`); // Wrap in array
     } else {
       questions = interview.jsonMockRes || [];
     }
+
     console.log("Parsed Questions:", questions);
   } catch (error) {
     console.error("Error parsing JSON:", error);
@@ -35,13 +41,13 @@ const InterviewItemCard = ({ interview }) => {
           Experience: {interview.jobExperience} years
         </p>
         <div className=" w-full mt-3 flex gap-3  items-center justify-between">
+          <Button onClick={onFeedback} size="sm" variant="outline">
+            Feedback
+          </Button>
 
-           
-            <Button onClick={onFeedback} size="sm" variant="outline">
-              Feedback
-            </Button>
-        
-          <Button onClick={onStart} className="bg-purple-500">Start</Button>
+          <Button onClick={onStart} className="bg-purple-500">
+            Start
+          </Button>
         </div>
       </div>
     </div>

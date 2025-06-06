@@ -4,20 +4,25 @@
 import { db } from '@/utils/db';
 import { MockInterview } from '@/utils/schema';
 import { eq } from 'drizzle-orm';
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import QuestionSection from './_components/QuestionSection';
 import RecordAnswerSection from './_components/RecordAnswerSection';
 import { useRouter } from 'next/navigation';
+
+// // ✅ WebcamFaceDetection lazy import to prevent SSR issues
+// const WebcamFaceDetection = dynamic(() => import('./_components/WebcamFaceDetection'), { ssr: false })
 
 const StartInterview = ({ params }) => {
   const [interviewData, setInterviewData] = useState(null);
   const [mockInterviewQuestions, setMockInterviewQuestions] = useState([]);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const router = useRouter();
+    const unwrappedParams = use(params);  
+  const interviewId = unwrappedParams.interview;
 
-  useEffect(() => {
-    getInterviewDetails();
-  }, [params.interview]);
+    useEffect(() => {
+      getInterviewDetails();
+    }, [interviewId]);
 
   const getInterviewDetails = async () => {
     try {
@@ -63,13 +68,12 @@ const StartInterview = ({ params }) => {
     }
   };
 
-  // ✅ Improved tab switch / minimize detection
+  // ✅ Tab switch / minimize detection
   useEffect(() => {
     let blurTimeout;
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
-        // delay to avoid false triggers from permission prompts
         blurTimeout = setTimeout(() => {
           handleAutoSubmit();
         }, 1000);
@@ -77,7 +81,6 @@ const StartInterview = ({ params }) => {
     };
 
     const handleWindowBlur = () => {
-      // also use delay here to filter out permission prompt blur
       blurTimeout = setTimeout(() => {
         if (document.visibilityState === 'hidden') {
           handleAutoSubmit();
@@ -112,6 +115,7 @@ const StartInterview = ({ params }) => {
           activeQuestionIndex={activeQuestionIndex}
           setActiveQuestionIndex={setActiveQuestionIndex}
           interviewData={interviewData}
+           handleAutoSubmit={handleAutoSubmit} 
         />
       </div>
     </div>

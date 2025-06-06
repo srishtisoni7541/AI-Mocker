@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import Webcam from "react-webcam";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -14,12 +13,14 @@ import { useUser } from "@clerk/nextjs";
 import moment from "moment";
 import { UserAnswer } from "@/utils/schema";
 import Link from "next/link";
+import WebcamFaceDetection from "./WebcamDetection";
 
 const RecordAnswerSection = ({
   mockInterviewQuestions,
   activeQuestionIndex,
   interviewData,
   setActiveQuestionIndex,
+  handleAutoSubmit
 }) => {
   console.log(interviewData);
   const { user } = useUser();
@@ -71,8 +72,8 @@ const RecordAnswerSection = ({
           question: activeQuestion?.question,
           answer: finalTranscript,
         });
-        console.log(feedback);
-        console.log("datta:",interviewData.mockId);
+        // console.log(feedback);
+        // console.log("datta:",interviewData.mockId);
 
         await db.insert(UserAnswer).values({
           mockIdRef: interviewData?.mockId,
@@ -106,7 +107,8 @@ const RecordAnswerSection = ({
   return (
     <div className="flex items-center justify-center flex-col">
       <div className="flex items-center justify-center bg-black rounded-lg p-4 mt-10 ml-5">
-        <Webcam mirrored={true} />
+              {/* ✅ Face detection component */}
+      <WebcamFaceDetection onViolation={handleAutoSubmit} />
       </div>
 
       <Button
