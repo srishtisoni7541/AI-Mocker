@@ -40,7 +40,7 @@ const WebcamFaceDetection = ({ onViolation }) => {
           warningCount.current += 1;
 
           if (warningCount.current <= 2) {
-            speak('Warning! Face not visible properly. Look at the screen.');
+            speak('Warning! Face not visible properly. Look at the screen.otherwise test will auto  submitted!');
           } else {
             onViolation(); 
           }

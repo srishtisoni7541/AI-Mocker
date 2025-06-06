@@ -14,6 +14,8 @@ import { useRouter } from 'next/navigation';
 
 const StartInterview = ({ params }) => {
   const [interviewData, setInterviewData] = useState(null);
+  const [violationCount, setViolationCount] = useState(0);
+
   const [mockInterviewQuestions, setMockInterviewQuestions] = useState([]);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const router = useRouter();
@@ -51,52 +53,132 @@ const StartInterview = ({ params }) => {
     }
   };
 
-  // ✅ Auto-submit function
-  const handleAutoSubmit = async () => {
-    try {
-      await fetch('/api/submit-test', {
+  // // ✅ Auto-submit function
+  // const handleAutoSubmit = async () => {
+  //   try {
+  //     await fetch('/api/submit-test', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         interviewId: params.interview,
+  //         status: 'auto-submitted',
+  //       }),
+  //     });
+  //     router.push('/test-submitted');
+  //   } catch (error) {
+  //     console.error('Auto submission failed:', error);
+  //   }
+  // };
+
+
+
+const handleAutoSubmit = (type = "face") => {
+  if (type === "tab") {
+    // 🟢 Immediate auto-submit on tab switch
+    fetch('/api/submit-test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        interviewId: params.interview,
+        status: 'auto-submitted',
+      }),
+    })
+      .then(() => {
+        router.push('/test-submitted');
+      })
+      .catch((error) => {
+        console.error('Auto submission failed:', error);
+      });
+    return;
+  }
+
+  // 🟡 Face violation (give 2 warnings, then auto-submit)
+  setViolationCount((prev) => {
+    const newCount = prev + 1;
+
+    if (newCount >= 3) {
+      fetch('/api/submit-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           interviewId: params.interview,
           status: 'auto-submitted',
         }),
-      });
-      router.push('/test-submitted');
-    } catch (error) {
-      console.error('Auto submission failed:', error);
+      })
+        .then(() => {
+          router.push('/test-submitted');
+        })
+        .catch((error) => {
+          console.error('Auto submission failed:', error);
+        });
+    } else {
+      console.warn(`⚠️ Face not detected! Warning ${newCount}/2`);
+    }
+
+    return newCount;
+  });
+};
+
+
+  // // ✅ Tab switch / minimize detection
+  // useEffect(() => {
+  //   let blurTimeout;
+
+  //   const handleVisibilityChange = () => {
+  //     if (document.visibilityState === 'hidden') {
+  //       blurTimeout = setTimeout(() => {
+  //         handleAutoSubmit();
+  //       }, 1000);
+  //     }
+  //   };
+
+  //   const handleWindowBlur = () => {
+  //     blurTimeout = setTimeout(() => {
+  //       if (document.visibilityState === 'hidden') {
+  //         handleAutoSubmit();
+  //       }
+  //     }, 1000);
+  //   };
+
+  //   document.addEventListener('visibilitychange', handleVisibilityChange);
+  //   window.addEventListener('blur', handleWindowBlur);
+
+  //   return () => {
+  //     document.removeEventListener('visibilitychange', handleVisibilityChange);
+  //     window.removeEventListener('blur', handleWindowBlur);
+  //     clearTimeout(blurTimeout);
+  //   };
+  // }, []);
+
+useEffect(() => {
+  let blurTimeout;
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') {
+      blurTimeout = setTimeout(() => {
+        handleAutoSubmit("tab"); // 🔴 Immediate submission on tab hide
+      }, 1000);
     }
   };
 
-  // ✅ Tab switch / minimize detection
-  useEffect(() => {
-    let blurTimeout;
-
-    const handleVisibilityChange = () => {
+  const handleWindowBlur = () => {
+    blurTimeout = setTimeout(() => {
       if (document.visibilityState === 'hidden') {
-        blurTimeout = setTimeout(() => {
-          handleAutoSubmit();
-        }, 1000);
+        handleAutoSubmit("tab"); // 🔴 Immediate submission on blur
       }
-    };
+    }, 1000);
+  };
 
-    const handleWindowBlur = () => {
-      blurTimeout = setTimeout(() => {
-        if (document.visibilityState === 'hidden') {
-          handleAutoSubmit();
-        }
-      }, 1000);
-    };
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  window.addEventListener('blur', handleWindowBlur);
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('blur', handleWindowBlur);
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    window.removeEventListener('blur', handleWindowBlur);
+    clearTimeout(blurTimeout);
+  };
+}, []);
 
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('blur', handleWindowBlur);
-      clearTimeout(blurTimeout);
-    };
-  }, []);
 
   return (
     <div>

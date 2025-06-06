@@ -20,18 +20,15 @@ const RecordAnswerSection = ({
   activeQuestionIndex,
   interviewData,
   setActiveQuestionIndex,
-  handleAutoSubmit
+  handleAutoSubmit,
 }) => {
   console.log(interviewData);
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
 
-  const {
-    transcript,
-    resetTranscript,
-    browserSupportsSpeechRecognition,
-  } = useSpeechRecognition();
+  const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
 
   const questions = Array.isArray(mockInterviewQuestions?.[0])
     ? mockInterviewQuestions[0]
@@ -107,8 +104,8 @@ const RecordAnswerSection = ({
   return (
     <div className="flex items-center justify-center flex-col">
       <div className="flex items-center justify-center bg-black rounded-lg p-4 mt-10 ml-5">
-              {/* ✅ Face detection component */}
-      <WebcamFaceDetection onViolation={handleAutoSubmit} />
+        {/* ✅ Face detection component */}
+        <WebcamFaceDetection onViolation={() => handleAutoSubmit("face")} />
       </div>
 
       <Button
@@ -144,9 +141,9 @@ const RecordAnswerSection = ({
           </Button>
         )}
         {activeQuestionIndex === questions.length - 1 && (
-         <Link href={`/dashboard/interview/${interviewData?.mockId}/feedback`}>
-          <Button className="py-2 px-6">End Interview</Button>
-         </Link>
+          <Link href={`/dashboard/interview/${interviewData?.mockId}/feedback`}>
+            <Button className="py-2 px-6">End Interview</Button>
+          </Link>
         )}
       </div>
     </div>
