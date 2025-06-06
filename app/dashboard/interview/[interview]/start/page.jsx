@@ -9,7 +9,7 @@ import QuestionSection from './_components/QuestionSection';
 import RecordAnswerSection from './_components/RecordAnswerSection';
 import { useRouter } from 'next/navigation';
 
-// // ✅ WebcamFaceDetection lazy import to prevent SSR issues
+// // WebcamFaceDetection lazy import to prevent SSR issues
 // const WebcamFaceDetection = dynamic(() => import('./_components/WebcamFaceDetection'), { ssr: false })
 
 const StartInterview = ({ params }) => {
