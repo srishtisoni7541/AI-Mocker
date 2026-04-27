@@ -4,7 +4,7 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ai = new GoogleGenerativeAI("AIzaSyBpQcqlaJqIvfAmybaCBmA8w9AATrYxOXY");
+const ai = new GoogleGenerativeAI("AIzaSyDpysmppwndpzOFIv32cPlzC5pxf5b_3y0");
 
 async function generateInterviewQuestions({ jobRole, experience, techStack }) {
   const prompt = `

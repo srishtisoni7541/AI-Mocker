@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ai = new GoogleGenerativeAI("AIzaSyCV-6cC8w9_uYcHj9Xb-LQJwjdnXx2trf0");
+const ai = new GoogleGenerativeAI("AIzaSyDpysmppwndpzOFIv32cPlzC5pxf5b_3y0");
 
 async function generateFeedback({ question, answer }) {
   const prompt = `
@@ -18,7 +18,7 @@ async function generateFeedback({ question, answer }) {
     }
   `;
 
-  const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = ai.getGenerativeModel({ model: "gemini-3-flash-preview" });
   const result = await model.generateContent(prompt);
   const response = await result.response;
   let text = await response.text();
