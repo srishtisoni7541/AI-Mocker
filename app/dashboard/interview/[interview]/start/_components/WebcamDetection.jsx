@@ -22,36 +22,36 @@ const WebcamFaceDetection = ({ onViolation }) => {
     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
   };
 
-  useEffect(() => {
-    loadModels();
+  // useEffect(() => {
+  //   loadModels();
 
-    const interval = setInterval(async () => {
-      if (
-        webcamRef.current &&
-        webcamRef.current.video.readyState === 4
-      ) {
-        const video = webcamRef.current.video;
-        const detections = await faceapi.detectSingleFace(
-          video,
-          new faceapi.TinyFaceDetectorOptions()
-        );
+  //   // const interval = setInterval(async () => {
+  //   //   if (
+  //   //     webcamRef.current &&
+  //   //     webcamRef.current.video.readyState === 4
+  //   //   ) {
+  //   //     const video = webcamRef.current.video;
+  //   //     const detections = await faceapi.detectSingleFace(
+  //   //       video,
+  //   //       new faceapi.TinyFaceDetectorOptions()
+  //   //     );
 
-        if (!detections) {
-          warningCount.current += 1;
+  //   //     if (!detections) {
+  //   //       warningCount.current += 1;
 
-          if (warningCount.current <= 2) {
-            speak('Warning! Face not visible properly. Look at the screen.otherwise test will auto  submitted!');
-          } else {
-            onViolation(); 
-          }
-        } else {
-          warningCount.current = 0;
-        }
-      }
-    }, 5000); // every 5 seconds
+  //   //       if (warningCount.current <= 2) {
+  //   //         speak('Warning! Face not visible properly. Look at the screen.otherwise test will auto  submitted!');
+  //   //       } else {
+  //   //         onViolation(); 
+  //   //       }
+  //   //     } else {
+  //   //       warningCount.current = 0;
+  //   //     }
+  //   //   }
+  //   // }, 5000); // every 5 seconds
 
-    return () => clearInterval(interval);
-  }, [speak, onViolation]);
+  //   return () => clearInterval(interval);
+  // }, [speak, onViolation]);
 
   return (
     <div className="border border-gray-300 rounded-md overflow-hidden w-[300px] h-[220px] mx-auto my-4">

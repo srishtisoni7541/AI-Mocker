@@ -150,34 +150,34 @@ const handleAutoSubmit = (type = "face") => {
   //   };
   // }, []);
 
-useEffect(() => {
-  let blurTimeout;
+// useEffect(() => {
+//   let blurTimeout;
 
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === 'hidden') {
-      blurTimeout = setTimeout(() => {
-        handleAutoSubmit("tab"); // 🔴 Immediate submission on tab hide
-      }, 1000);
-    }
-  };
+//   const handleVisibilityChange = () => {
+//     if (document.visibilityState === 'hidden') {
+//       blurTimeout = setTimeout(() => {
+//         handleAutoSubmit("tab"); // 🔴 Immediate submission on tab hide
+//       }, 1000);
+//     }
+//   };
 
-  const handleWindowBlur = () => {
-    blurTimeout = setTimeout(() => {
-      if (document.visibilityState === 'hidden') {
-        handleAutoSubmit("tab"); // 🔴 Immediate submission on blur
-      }
-    }, 1000);
-  };
+//   const handleWindowBlur = () => {
+//     blurTimeout = setTimeout(() => {
+//       if (document.visibilityState === 'hidden') {
+//         handleAutoSubmit("tab"); // 🔴 Immediate submission on blur
+//       }
+//     }, 1000);
+//   };
 
-  document.addEventListener('visibilitychange', handleVisibilityChange);
-  window.addEventListener('blur', handleWindowBlur);
+//   document.addEventListener('visibilitychange', handleVisibilityChange);
+//   window.addEventListener('blur', handleWindowBlur);
 
-  return () => {
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
-    window.removeEventListener('blur', handleWindowBlur);
-    clearTimeout(blurTimeout);
-  };
-}, []);
+//   return () => {
+//     document.removeEventListener('visibilitychange', handleVisibilityChange);
+//     window.removeEventListener('blur', handleWindowBlur);
+//     clearTimeout(blurTimeout);
+//   };
+// }, []);
 
 
   return (

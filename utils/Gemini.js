@@ -4,7 +4,7 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ai = new GoogleGenerativeAI("AIzaSyCV-6cC8w9_uYcHj9Xb-LQJwjdnXx2trf0");
+const ai = new GoogleGenerativeAI("AIzaSyBpQcqlaJqIvfAmybaCBmA8w9AATrYxOXY");
 
 async function generateInterviewQuestions({ jobRole, experience, techStack }) {
   const prompt = `
@@ -37,7 +37,7 @@ async function generateInterviewQuestions({ jobRole, experience, techStack }) {
     Keep the language simple and beginner friendly.
   `;
 
-  const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = ai.getGenerativeModel({ model: "gemini-3-flash-preview" });
   const result = await model.generateContent(prompt);
   const response = await result.response;
   let text = await response.text();

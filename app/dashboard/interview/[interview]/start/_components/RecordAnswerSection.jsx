@@ -57,6 +57,7 @@ const RecordAnswerSection = ({
       handleStop();
 
       const finalTranscript = transcript.trim();
+      console.log(finalTranscript);
 
       if (finalTranscript.length < 10) {
         toast("Error while saving your answer, Please record again!");
