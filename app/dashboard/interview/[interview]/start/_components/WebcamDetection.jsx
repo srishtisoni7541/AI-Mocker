@@ -1,57 +1,71 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useCallback } from 'react';
-import * as faceapi from 'face-api.js';
-import Webcam from 'react-webcam';
+import React, { useEffect, useRef, useCallback } from "react";
+import Webcam from "react-webcam";
 
 const WebcamFaceDetection = ({ onViolation }) => {
   const webcamRef = useRef(null);
   const warningCount = useRef(0);
+  const faceapiRef = useRef(null); // store dynamically loaded lib
 
-  // ✅ Speak warning
   const speak = useCallback((msg) => {
     const synth = window.speechSynthesis;
     const utterance = new SpeechSynthesisUtterance(msg);
     synth.speak(utterance);
   }, []);
 
-  // ✅ Load face-api models
+  // ✅ Load face-api dynamically (IMPORTANT FIX)
   const loadModels = async () => {
-    const MODEL_URL = '/models';
+    const faceapi = await import("face-api.js");
+    faceapiRef.current = faceapi;
+
+    const MODEL_URL = "/models";
+
     await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
   };
 
-  // useEffect(() => {
-  //   loadModels();
+  useEffect(() => {
+    let interval;
 
-  //   // const interval = setInterval(async () => {
-  //   //   if (
-  //   //     webcamRef.current &&
-  //   //     webcamRef.current.video.readyState === 4
-  //   //   ) {
-  //   //     const video = webcamRef.current.video;
-  //   //     const detections = await faceapi.detectSingleFace(
-  //   //       video,
-  //   //       new faceapi.TinyFaceDetectorOptions()
-  //   //     );
+    const init = async () => {
+      await loadModels();
 
-  //   //     if (!detections) {
-  //   //       warningCount.current += 1;
+      interval = setInterval(async () => {
+        if (
+          webcamRef.current &&
+          webcamRef.current.video.readyState === 4 &&
+          faceapiRef.current
+        ) {
+          const video = webcamRef.current.video;
 
-  //   //       if (warningCount.current <= 2) {
-  //   //         speak('Warning! Face not visible properly. Look at the screen.otherwise test will auto  submitted!');
-  //   //       } else {
-  //   //         onViolation(); 
-  //   //       }
-  //   //     } else {
-  //   //       warningCount.current = 0;
-  //   //     }
-  //   //   }
-  //   // }, 5000); // every 5 seconds
+          const detections =
+            await faceapiRef.current.detectSingleFace(
+              video,
+              new faceapiRef.current.TinyFaceDetectorOptions()
+            );
 
-  //   return () => clearInterval(interval);
-  // }, [speak, onViolation]);
+          if (!detections) {
+            warningCount.current += 1;
+
+            if (warningCount.current <= 2) {
+              speak(
+                "Warning! Face not visible properly. Look at the screen."
+              );
+            } else {
+              onViolation();
+            }
+          } else {
+            warningCount.current = 0;
+          }
+        }
+      }, 5000);
+    };
+
+    init();
+
+    return () => clearInterval(interval);
+  }, [speak, onViolation]);
 
   return (
     <div className="border border-gray-300 rounded-md overflow-hidden w-[300px] h-[220px] mx-auto my-4">
